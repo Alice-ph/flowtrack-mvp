@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
@@ -11,7 +11,7 @@ type StreamRow = {
   title: string;
 };
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -165,13 +165,16 @@ export default function OnboardingPage() {
           {loadingStream
             ? "Проверяем код приглашения..."
             : stream
-            ? <>Вы подключаетесь к программе: <span className="font-medium text-slate-900">{stream.title}</span></>
+            ? `Вы подключаетесь к программе: ${stream.title}`
             : "Не удалось определить поток."}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>
-            <label htmlFor="full-name" className="mb-2 block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="full-name"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
               Имя
             </label>
             <input
@@ -185,7 +188,10 @@ export default function OnboardingPage() {
           </div>
 
           <div>
-            <label htmlFor="phone" className="mb-2 block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="phone"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
               Телефон
             </label>
             <input
@@ -206,7 +212,8 @@ export default function OnboardingPage() {
               onChange={(e) => setConsentGiven(e.target.checked)}
             />
             <span>
-              Я соглашаюсь на обработку персональных данных для участия в программе.
+              Я соглашаюсь на обработку персональных данных для участия в
+              программе.
             </span>
           </label>
 
@@ -226,5 +233,21 @@ export default function OnboardingPage() {
         ) : null}
       </div>
     </section>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense
+      fallback={
+        <section className="mx-auto w-full max-w-2xl px-4 py-16 sm:px-6">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-sm text-slate-500">Загрузка онбординга...</p>
+          </div>
+        </section>
+      }
+    >
+      <OnboardingContent />
+    </Suspense>
   );
 }
